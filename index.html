@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title></title>
+  <script type="text/javascript" src="https://cdn.rawgit.com/Theodeus/tuna/master/tuna-min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style type="text/css">
+    body {
+        background: #000;
+    }
+
+    .vis {
+        height: 100%;
+    }
+
+    .menu {
+        border: 1px solid #666;
+        min-height: 600px;
+        max-height: 100%;
+        margin-top: 20px;
+        background: rgba(0,0,0,0.5);
+    }
+
+    .menu button, .menu select {
+        margin: 10px;
+        display: inline;
+        border-radius: 0px;
+        box-shadow: 2px 2px 6px rgb(102, 102, 102);
+    }
+
+    .menu button {
+        width: 75px;
+    }
+
+    .menu select {
+        width: 100px;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="col-sm-7 vis" id="vis">
+        <svg id="svg" height="1000" width="1000" xmlns:svgjs="http://svgjs.com/svgjs" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
+            <g style="display: none;" id="sample">
+                <circle cx="300" cy="300" r='40' fill='#00ffff'
+                style="stroke:#000; stroke-width:10px;"/>
+                <rect fill="#fff" y="300" x="300" height="10" width="2"/>
+                <animateTransform
+                attributeName="transform"
+                begin="0s"
+                dur="20s"
+                type="rotate"
+                from="0 300 300"
+                to="360 300 300"
+                repeatCount="indefinite"
+                />
+            </g>
+
+        </svg>
+    </div>
+    <div class="col-sm-5 menu" id="menu">
+        <button class="btn" id="addSound">Push</button>
+        <button class="btn" id="removeSound">Pop</button>
+    </div>
+    <script type="text/javascript">
+        function createCircle(){var a=document.getElementById("sample").cloneNode(!0);return a.style.display="block",a.id=elements.length,a.getElementsByTagName("circle")[0].setAttribute("r",20*(elements.length+1)),a.getElementsByTagName("circle")[0].setAttribute("fill",colors[a.id%7]),a.getElementsByTagName("rect")[0].setAttribute("y",290- -20*(elements.length+1)),svg.insertBefore(a,svg.firstChild),a.getElementsByTagName("animateTransform")[0].setAttribute("dur","1s"),a.getElementsByTagName("animateTransform")[0].beginElement(),a}function removeCircle(a){svg.removeChild(a)}function triggerSound(a,b,c){if("other"!=a){var d=context.createOscillator();d.type=a,d.frequency.value=b;var e=context.createGain();e.gain.linearRampToValueAtTime(.5,context.currentTime+2),e.gain.value=1,d.start(0),d.stop(context.currentTime+.1),d.connect(e),e.connect(delay.input),delay.connect(context.destination)}else{var f=context.createBufferSource();f.buffer=c,f.connect(context.destination),f.start()}}var context=new(window.AudioContext||window.webkitAudioContext),tuna=new Tuna(context),svg=document.getElementById("svg"),elements=[],circleCount=0,colors=["#8A2BE2","#0000CD","#00FFFF","#008000","#FFFF00","#FFA500","#FF0000"],colorIndex=0,delay=new tuna.Convolver({highCut:22050,lowCut:80,dryLevel:.5,wetLevel:1,level:1,impulse:"https://cdn.rawgit.com/Theodeus/tuna/master/impulses/impulse_rev.wav",bypass:0}),addButton=document.getElementById("addSound"),removeButton=document.getElementById("removeSound"),menu=document.getElementById("menu");addButton.onclick=function(){if(elements.length<12){var a=document.createElement("div");a.setAttribute("id",elements.length);var b=document.createElement("select");b.classList.add("form-control");for(var c=100;1e4>=c;c+=100){var d=document.createElement("option");d.value=c,d.innerHTML=c,1e3==c&&(d.selected=!0),b.appendChild(d)}b.onchange=function(a){var b=a.target.parentElement.id;elements[b].period=a.target.value,clearInterval(elements[b].interval),elements[b].circle.getElementsByTagName("animateTransform")[0].setAttribute("dur",a.target.value/1e3+"s"),elements[b].circle.getElementsByTagName("animateTransform")[0].beginElement(),elements[b].interval=setInterval(function(){triggerSound(elements[b].type,elements[b].note,n.buffer)},elements[b].period)};var e=document.createElement("input");e.type="file",e.onchange=function(a){var b=a.target.parentElement.id,c=new FileReader;c.onload=function(){context.decodeAudioData(c.result,function(a){elements[b].buffer=a})},c.readAsArrayBuffer(e.files[0])};var f=document.createElement("select");f.classList.add("form-control");var g=document.createElement("option");g.value="sine",g.innerHTML="Sine";var h=document.createElement("option");h.value="square",h.innerHTML="Square";var i=document.createElement("option");i.value="sawtooth",i.innerHTML="Sawtooth";var j=document.createElement("option");j.value="triangle",j.innerHTML="Triangle";var k=document.createElement("option");k.value="other",k.innerHTML="Other",f.appendChild(g),f.appendChild(h),f.appendChild(i),f.appendChild(j),f.appendChild(k),f.onchange=function(a){var b=a.target.parentElement.id;"other"==a.target.value&&e.click(),elements[b].type=a.target.value};var l=document.getElementById("note-select").cloneNode(!0);l.hidden=!1,l.classList.add("form-control"),l.onchange=function(a){var b=a.target.parentElement.id;elements[b].note=a.target.value},a.appendChild(b),a.appendChild(e),a.appendChild(f),a.appendChild(l),menu.appendChild(a);var m=createCircle(),n={menu:a,period:1e3,type:"sine",note:440,id:elements.length,circle:m};elements.push(n),n.interval=setInterval(function(a){triggerSound(n.type,n.note,n.buffer)},n.period)}},removeButton.onclick=function(a){var b=elements.pop();a.target.parentElement.removeChild(b.menu),clearInterval(b.interval),removeCircle(b.circle)};
+        </script>
+    </div>
+
+    <select id="note-select" hidden>
+        <option value="16.315">C0</option>
+        <option value="17.324">C0#</option>
+        <option value="18.354">D0</option>
+        <option value="19.445">D0#</option>
+        <option value="20.601">E0</option>
+        <option value="21.827">F0</option>
+        <option value="23.124">F0#</option>
+        <option value="24.499">G0</option>
+        <option value="25.956">G0#</option>
+        <option value="27.5">A0</option>
+        <option value="29.135">A0#</option>
+        <option value="30.868">B0</option>
+        <option value="32.703">C1</option>
+        <option value="34.648">C1#</option>
+        <option value="36.708">D1</option>
+        <option value="38.891">D1#</option>
+        <option value="41.203">E1</option>
+        <option value="43.654">F1</option>
+        <option value="46.249">F1#</option>
+        <option value="48.999">G1</option>
+        <option value="51.913">G1#</option>
+        <option value="55">A1</option>
+        <option value="58.27">A1#</option>
+        <option value="61.735">B1</option>
+        <option value="65.406">C2</option>
+        <option value="69.296">C2#</option>
+        <option value="73.416">D2</option>
+        <option value="77.782">D2#</option>
+        <option value="82.407">E2</option>
+        <option value="87.307">F2</option>
+        <option value="92.499">F2#</option>
+        <option value="97.999">G2</option>
+        <option value="103.826">G2#</option>
+        <option value="110">A2</option>
+        <option value="116.541">A2#</option>
+        <option value="123.471">B2</option>
+        <option value="130.813">C3</option>
+        <option value="138.591">C3#</option>
+        <option value="146.832">D3</option>
+        <option value="155.563">D3#</option>
+        <option value="164.814">E3</option>
+        <option value="174.614">F3</option>
+        <option value="184.997">F3#</option>
+        <option value="195.998">G3</option>
+        <option value="207.652">G3#</option>
+        <option value="220">A3</option>
+        <option value="233.082">A3#</option>
+        <option value="246.942">B3</option>
+        <option value="261.626">C4</option>
+        <option value="277.183">C4#</option>
+        <option value="293.665">D4</option>
+        <option value="311.127">D4#</option>
+        <option value="329.628">E4</option>
+        <option value="349.228">F4</option>
+        <option value="369.994">F4#</option>
+        <option value="391.995">G4</option>
+        <option value="415.305">G4#</option>
+        <option value="440" selected="">A4</option>
+        <option value="466.164">A4#</option>
+        <option value="493.883">B4</option>
+        <option value="523.251">C5</option>
+        <option value="554.365">C5#</option>
+        <option value="587.33">D5</option>
+        <option value="622.254">D5#</option>
+        <option value="659.255">E5</option>
+        <option value="698.456">F5</option>
+        <option value="739.989">F5#</option>
+        <option value="783.991">G5</option>
+        <option value="830.609">G5#</option>
+        <option value="880">A5</option>
+        <option value="932.328">A5#</option>
+        <option value="987.767">B5</option>
+        <option value="1046.502">C6</option>
+        <option value="1108.731">C6#</option>
+        <option value="1174.659">D6</option>
+        <option value="1244.508">D6#</option>
+        <option value="1318.51">E6</option>
+        <option value="1396.913">F6</option>
+        <option value="1479.978">F6#</option>
+        <option value="1567.982">G6</option>
+        <option value="1661.219">G6#</option>
+        <option value="1760">A6</option>
+        <option value="1864.655">A6#</option>
+        <option value="1975.533">B6</option>
+        <option value="2093.005">C7</option>
+        <option value="2217.461">C7#</option>
+        <option value="2349.318">D7</option>
+        <option value="2489.016">D7#</option>
+        <option value="2637.021">E7</option>
+        <option value="2793.826">F7</option>
+        <option value="2959.955">F7#</option>
+        <option value="3135.964">G7</option>
+        <option value="3322.438">G7#</option>
+        <option value="3520">A7</option>
+        <option value="3729.31">A7#</option>
+        <option value="3951.066">B7</option>
+        <option value="4186.009">C8</option>
+        <option value="4434.922">C8#</option>
+        <option value="4698.636">D8</option>
+        <option value="4978.032">D8#</option>
+        <option value="5274.042">E8</option>
+        <option value="5587.652">F8</option>
+        <option value="5919.91">F8#</option>
+        <option value="6271.928">G8</option>
+        <option value="6644.876">G8#</option>
+        <option value="7040">A8</option>
+        <option value="7458.62">A8#</option>
+        <option value="7902.132">B8</option>
+        <option value="8372.018">C9</option>
+        <option value="8869.844">C9#</option>
+        <option value="9397.272">D9</option>
+        <option value="9956.064">D9#</option>
+        <option value="10548.084">E9</option>
+        <option value="11175.304">F9</option>
+        <option value="11839.82">F9#</option>
+        <option value="12543.856">G9</option>
+        <option value="13289.752">G9#</option>
+        <option value="14080">A9</option>
+        <option value="14917.24">A9#</option>
+        <option value="15804.264">B9</option>
+    </select>
+
+</body>
+</html>
