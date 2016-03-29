@@ -1,77 +1,79 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset='utf-8'>
-  <title></title>
-  <script type="text/javascript" src="https://cdn.rawgit.com/Theodeus/tuna/master/tuna-min.js"></script>
-  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-  <style type="text/css">
+    <meta charset='utf-8'>
+    <title></title>
+    <script type="text/javascript" src="https://cdn.rawgit.com/Theodeus/tuna/master/tuna-min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <style type="text/css">
     body {
         background: #000;
+        overflow-y: hidden;
     }
-
+    
     .vis {
         height: 100%;
     }
-
+    
     .menu {
-        border: 1px solid #666;
-        min-height: 600px;
-        max-height: 100%;
+        min-height: 200px;
+        max-height: 600px;
+        overflow-y: auto;
         margin-top: 20px;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
     }
-
-    .menu button, .menu select {
+    
+    .menu button,
+    .menu select {
         margin: 10px;
         display: inline;
         border-radius: 0px;
         box-shadow: 2px 2px 6px rgb(102, 102, 102);
     }
-
+    
     .menu button {
-        width: 75px;
+        width: 50px;
+        height: 50px;
+        background: none;
+        color: #fff;
+        border: 1px solid;
+        border-radius: 33px;
+        margin-left: 110px;
+        margin-top: 20px;
     }
-
+    
     .menu select {
         width: 100px;
     }
-
+    
     input[type="file"] {
         display: none;
     }
-</style>
+    </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="col-sm-7 vis" id="vis">
-        <svg id="svg" height="1000" width="1000" xmlns:svgjs="http://svgjs.com/svgjs" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
-            <g style="display: none;" id="sample">
-                <circle cx="300" cy="300" r='40' fill='#00ffff'
-                style="stroke:#000; stroke-width:10px;"/>
-                <rect fill="#fff" y="300" x="300" height="10" width="2"/>
-                <animateTransform
-                attributeName="transform"
-                begin="0s"
-                dur="20s"
-                type="rotate"
-                from="0 300 300"
-                to="360 300 300"
-                repeatCount="indefinite"
-                />
-            </g>
-
-        </svg>
+    <div class="container">
+        <div class="col-sm-7 vis" id="vis">
+            <svg id="svg" height="800" width="800" xmlns:svgjs="http://svgjs.com/svgjs" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <g style="display: none;" id="sample">
+                    <circle cx="300" cy="300" r='40' fill='#00ffff' style="stroke:#000; stroke-width:10px;" />
+                    <rect fill="#fff" y="300" x="300" height="12" width="2" />
+                    <animateTransform attributeName="transform" begin="0s" dur="20s" type="rotate" from="0 300 300" to="360 300 300" repeatCount="indefinite" />
+                </g>
+                <rect fill="#fff" y="300" x="300" height="245" width="1" style="opacity: 0.3;" />
+            </svg>
+        </div>
+        <div class="col-sm-5 menu" id="menu">
+            <button class="btn" id="addSound">
+                <span class="glyphicon glyphicon-plus"></span>
+            </button>
+            <button class="btn" id="removeSound">
+                <span class="glyphicon glyphicon-minus"></span>
+            </button>
+        </div>
     </div>
-    <div class="col-sm-5 menu" id="menu">
-        <button class="btn" id="addSound">Push</button>
-        <button class="btn" id="removeSound">Pop</button>
-    </div>
-    <script type="text/javascript">
-        function createCircle(){var a=document.getElementById("sample").cloneNode(!0);return a.style.display="block",a.id=elements.length,a.getElementsByTagName("circle")[0].setAttribute("r",20*(elements.length+1)),a.getElementsByTagName("circle")[0].setAttribute("fill",colors[a.id%7]),a.getElementsByTagName("rect")[0].setAttribute("y",290- -20*(elements.length+1)),svg.insertBefore(a,svg.firstChild),a.getElementsByTagName("animateTransform")[0].setAttribute("dur","1s"),a.getElementsByTagName("animateTransform")[0].beginElement(),a}function removeCircle(a){svg.removeChild(a)}function triggerSound(a,b,c){if("other"!=a){var d=context.createOscillator();d.type=a,d.frequency.value=b;var e=context.createGain();e.gain.linearRampToValueAtTime(.5,context.currentTime+2),e.gain.value=1,d.start(0),d.stop(context.currentTime+.1),d.connect(e),e.connect(delay.input),delay.connect(context.destination)}else{var f=context.createBufferSource();f.buffer=c,f.connect(context.destination),f.start()}}var context=new(window.AudioContext||window.webkitAudioContext),tuna=new Tuna(context),svg=document.getElementById("svg"),elements=[],circleCount=0,colors=["#8A2BE2","#0000CD","#00FFFF","#008000","#FFFF00","#FFA500","#FF0000"],colorIndex=0,delay=new tuna.Convolver({highCut:22050,lowCut:80,dryLevel:.5,wetLevel:1,level:1,impulse:"https://cdn.rawgit.com/Theodeus/tuna/master/impulses/impulse_rev.wav",bypass:0}),addButton=document.getElementById("addSound"),removeButton=document.getElementById("removeSound"),menu=document.getElementById("menu");addButton.onclick=function(){if(elements.length<12){var a=document.createElement("div");a.setAttribute("id",elements.length);var b=document.createElement("select");b.classList.add("form-control");for(var c=100;1e4>=c;c+=100){var d=document.createElement("option");d.value=c,d.innerHTML=c,1e3==c&&(d.selected=!0),b.appendChild(d)}b.onchange=function(a){var b=a.target.parentElement.id;elements[b].period=a.target.value,clearInterval(elements[b].interval),elements[b].circle.getElementsByTagName("animateTransform")[0].setAttribute("dur",a.target.value/1e3+"s"),elements[b].circle.getElementsByTagName("animateTransform")[0].beginElement(),elements[b].interval=setInterval(function(){triggerSound(elements[b].type,elements[b].note,n.buffer)},elements[b].period)};var e=document.createElement("input");e.type="file",e.onchange=function(a){var b=a.target.parentElement.id,c=new FileReader;c.onload=function(){context.decodeAudioData(c.result,function(a){elements[b].buffer=a})},c.readAsArrayBuffer(e.files[0])};var f=document.createElement("select");f.classList.add("form-control");var g=document.createElement("option");g.value="sine",g.innerHTML="Sine";var h=document.createElement("option");h.value="square",h.innerHTML="Square";var i=document.createElement("option");i.value="sawtooth",i.innerHTML="Sawtooth";var j=document.createElement("option");j.value="triangle",j.innerHTML="Triangle";var k=document.createElement("option");k.value="other",k.innerHTML="Other",f.appendChild(g),f.appendChild(h),f.appendChild(i),f.appendChild(j),f.appendChild(k),f.onchange=function(a){var b=a.target.parentElement.id;"other"==a.target.value&&e.click(),elements[b].type=a.target.value};var l=document.getElementById("note-select").cloneNode(!0);l.hidden=!1,l.classList.add("form-control"),l.onchange=function(a){var b=a.target.parentElement.id;elements[b].note=a.target.value},a.appendChild(b),a.appendChild(e),a.appendChild(f),a.appendChild(l),menu.appendChild(a);var m=createCircle(),n={menu:a,period:1e3,type:"sine",note:440,id:elements.length,circle:m};elements.push(n),n.interval=setInterval(function(a){triggerSound(n.type,n.note,n.buffer)},n.period)}},removeButton.onclick=function(a){var b=elements.pop();a.target.parentElement.removeChild(b.menu),clearInterval(b.interval),removeCircle(b.circle)};
-        </script>
-    </div>
-
     <select id="note-select" hidden>
         <option value="16.315">C0</option>
         <option value="17.324">C0#</option>
@@ -194,6 +196,9 @@
         <option value="14917.24">A9#</option>
         <option value="15804.264">B9</option>
     </select>
-
+    <script type="text/javascript">
+        function createCircle(){var a=document.getElementById("sample").cloneNode(!0);return a.style.display="block",a.id=elements.length,a.getElementsByTagName("circle")[0].setAttribute("r",20*(elements.length+1)),a.getElementsByTagName("circle")[0].setAttribute("fill",colors[a.id%7]),a.getElementsByTagName("rect")[0].setAttribute("y",290- -20*(elements.length+1)),svg.insertBefore(a,svg.firstChild),a.getElementsByTagName("animateTransform")[0].setAttribute("dur","1s"),a.getElementsByTagName("animateTransform")[0].beginElement(),a}function removeCircle(a){svg.removeChild(a)}function triggerSound(a,b,c){if("other"!=a){var d=context.createOscillator();d.type=a,d.frequency.value=b;var e=context.createGain();e.gain.linearRampToValueAtTime(.5,context.currentTime+2),e.gain.value=1,d.start(0),d.stop(context.currentTime+.1),d.connect(e),e.connect(delay.input),delay.connect(context.destination)}else{var f=context.createBufferSource();f.buffer=c,f.connect(context.destination),f.start()}}var context=new(window.AudioContext||window.webkitAudioContext),tuna=new Tuna(context),svg=document.getElementById("svg"),elements=[],circleCount=0,colors=["#8A2BE2","#0000CD","#00FFFF","#008000","#FFFF00","#FFA500","#FF0000"],colorIndex=0,delay=new tuna.Convolver({highCut:22050,lowCut:80,dryLevel:.5,wetLevel:1,level:1,impulse:"impulses/impulse_rev.wav",bypass:0}),addButton=document.getElementById("addSound"),removeButton=document.getElementById("removeSound"),menu=document.getElementById("menu");addButton.onclick=function(){if(elements.length<12){var a=document.createElement("div");a.setAttribute("id",elements.length);var b=document.createElement("select");b.classList.add("form-control");for(var c=100;1e4>=c;c+=100){var d=document.createElement("option");d.value=c,d.innerHTML=c,1e3==c&&(d.selected=!0),b.appendChild(d)}b.onchange=function(a){var b=a.target.parentElement.id;elements[b].period=a.target.value,clearInterval(elements[b].interval),elements[b].circle.getElementsByTagName("animateTransform")[0].setAttribute("dur",a.target.value/1e3+"s"),elements[b].circle.getElementsByTagName("animateTransform")[0].beginElement(),elements[b].interval=setInterval(function(){triggerSound(elements[b].type,elements[b].note,n.buffer)},elements[b].period)};var e=document.createElement("input");e.type="file",e.onchange=function(a){var b=a.target.parentElement.id,c=new FileReader;c.onload=function(){context.decodeAudioData(c.result,function(a){elements[b].buffer=a})},c.readAsArrayBuffer(e.files[0])};var f=document.createElement("select");f.classList.add("form-control");var g=document.createElement("option");g.value="sine",g.innerHTML="Sine";var h=document.createElement("option");h.value="square",h.innerHTML="Square";var i=document.createElement("option");i.value="sawtooth",i.innerHTML="Sawtooth";var j=document.createElement("option");j.value="triangle",j.innerHTML="Triangle";var k=document.createElement("option");k.value="other",k.innerHTML="Other",f.appendChild(g),f.appendChild(h),f.appendChild(i),f.appendChild(j),f.appendChild(k),f.onchange=function(a){var b=a.target.parentElement.id;"other"==a.target.value&&e.click(),elements[b].type=a.target.value};var l=document.getElementById("note-select").cloneNode(!0);l.hidden=!1,l.classList.add("form-control"),l.onchange=function(a){var b=a.target.parentElement.id;elements[b].note=a.target.value},a.appendChild(b),a.appendChild(e),a.appendChild(f),a.appendChild(l),menu.appendChild(a);var m=createCircle(),n={menu:a,period:1e3,type:"sine",note:440,id:elements.length,circle:m};elements.push(n),n.interval=setInterval(function(a){triggerSound(n.type,n.note,n.buffer)},n.period)}},removeButton.onclick=function(a){var b=elements.pop();a.target.parentElement.removeChild(b.menu),clearInterval(b.interval),removeCircle(b.circle)},addButton.click();
+    </script>
 </body>
+
 </html>
